@@ -1,5 +1,6 @@
 from distutils.core import setup
 
+
 setup(
     name='siple',
     description='siple: a small inverse problems library',
