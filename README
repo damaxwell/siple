@@ -1,0 +1,39 @@
+siple: a Small Inverse Problems Library
+
+*************************************************************************
+Installation:
+
+A basic installation can be done using
+
+python setup.py install
+
+This will install siple at the system-wide level; you might need to run this command with 'sudo' to have the necessary privileges.  You
+can install it just for your user account using
+
+python setup.py install --user
+
+For other options, use 
+
+python setup.py install --help
+
+or 
+
+python setup.py --help
+
+
+*************************************************************************
+Documentation:
+
+There is a tutorial (in progress) in the docs directory.
+
+API documentation using sphinx will be forthcoming.
+
+
+
+*************************************************************************
+Examples:
+
+The scripts in the examples directory use siple to solve inverse problems 
+described in the tutorial.  See the comments at the beginning of each example to see a brief description of what is being done, and run the example with, e.g., 
+
+python examples/derivative.py
