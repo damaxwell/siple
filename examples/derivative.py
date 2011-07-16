@@ -5,7 +5,7 @@ from siple.linalg.linalg_numpy import NumpyVector
 import numpy as np
 from scipy import sparse
 from scipy.sparse.linalg import spsolve
-from siple.reporting import pause
+from siple.reporting import pause, endpause
 
 class ForwardProblem(LinearForwardProblem):
   def __init__(self,L,N):
@@ -50,20 +50,25 @@ class ForwardProblem(LinearForwardProblem):
     return x
 
 L=10
-N=1001;
+N=101;
 h=float(L)/N
 p = h*np.linspace(0,N-1,N)
 
 y = NumpyVector(3*np.sin(p*np.pi*2/L)+np.cos(4*p*np.pi*2/L))
-Linf_error = 0.2
+Linf_error = 0.01
 L2_error = np.sqrt(L*Linf_error**2)
 
 y += siple.rand.random_vector(y,scale=Linf_error)
 
 x0 = y.zero_like()
-params = siple.Parameters(ITER_MAX=10000)
+params = BasicKrylovCGNE.defaultParameters()
+params.steepest_descent = True
 solver = BasicKrylovCGNE(ForwardProblem(L,N),params=params)
 (xc,yc) = solver.solve(x0,y,L2_error)
 
 from matplotlib import pyplot as pp
-pp.plot(p,y.core(),p,xc.core(),p,yc.core())
+pp.plot(p,y.core(),p,yc.core(),p,xc.core())
+pp.legend(('Measured function', 'Computed function', 'Computed derivative'))
+pp.draw()
+
+endpause()

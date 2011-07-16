@@ -62,7 +62,7 @@ class KrylovSolver:
     So initialize returns a pair of AbstractVectors (x0,y) which are possibly modified and or wrapped
     versions of the input data.
     
-    The arguments *args are passed directly from 'run'.
+    The arguments \*args are passed directly from 'run'.
     """
     return (x0,y)
 
@@ -122,7 +122,7 @@ class KrylovCG(KrylovSolver):
 
       Td = forward_problem.T(d,out=Td)
 
-      self.iterationHook( count, x, y, d, r, Td, TStarR )
+      self.iterationHook( count, x, y, d, r, Td )
 
       alpha = normsq_r/forward_problem.domainIP(d,Td)
       if( (count+1 % cg_reset) == 0 ): 
@@ -227,9 +227,9 @@ class KrylovCGNE(KrylovSolver):
     Tx = forward_problem.T(x, out=Tx)
     return self.finalize(x,Tx)
 
-class BasicKrylovCGNE(KrylovCGNE):
+class BasicKrylovCG(KrylovCG):
   """
-  Implements the CGNE regularization method for solving the linear ill posed problem
+  Implements the CG regularization method for solving the linear ill posed problem
   
     T(x) = y
     
@@ -243,7 +243,7 @@ class BasicKrylovCGNE(KrylovCGNE):
   The specific problem to solve is specified as an argument to the constructor.
   """
   def __init__(self,forward_problem,params=None):
-    KrylovCGNE.__init__(self,params)
+    KrylovCG.__init__(self,params)
     self.forward_problem = forward_problem
     
   def forwardProblem(self):
@@ -258,6 +258,60 @@ class BasicKrylovCGNE(KrylovCGNE):
     
     The third argument is the desired value of ||y-T(x)||_Y
     """
+    return KrylovCG.solve(self,x0,y,targetDiscrepancy)
+
+  def initialize(self,x0,y,targetDiscrepancy):
+    """
+    This method is a hook called at the beginning of a run.  It gives an opportunity for the class to 
+    set up information needed to decide conditions for the final stopping criterion.
+
+    It may be that the initial data 'x0' expresses the the initial data for the problem T(x)=y
+    indirectly. Or it could be that x0 and y are expressed as dolfin.Function's rather than dolfind.GenericVectors.
+    So initialize returns a triple of vectors (x0,y) which are possibly modified versions of the input data.
+
+    The arguments \*args are passed directly from 'run'.
+    """
+    self.targetDiscrepancy = targetDiscrepancy
+    return (x0,y)
+
+  def stopConditionMet(self,iter,x,y,r):
+    """
+    Given a current iteration number, current value of x, desired value y of F(X), and current residual, 
+    returns whether the stop condition has been met.
+    """
+    return sqrt(self.forward_problem.rangeIP(r,r)) <= self.params.mu*self.targetDiscrepancy
+
+class BasicKrylovCGNE(KrylovCGNE):
+  """
+  Implements the CGNE regularization method for solving the linear ill posed problem
+
+    T(x) = y
+
+  using the Morozov discrepancy principle.  The discrepancy of 'x' is
+
+    ||y-T(x)||_Y
+
+  and the algorithm is run until a target discrepancy (specified as an argument to solve)
+  is reached.
+
+  The specific problem to solve is specified as an argument to the constructor.
+  """
+  def __init__(self,forward_problem,params=None):
+    KrylovCGNE.__init__(self,params)
+    self.forward_problem = forward_problem
+
+  def forwardProblem(self):
+    """
+    Returns the LinearForwardProblem that defines the inverse problem. 
+    """
+    return self.forward_problem
+
+  def solve(self,x0,y,targetDiscrepancy):
+    """
+    Run the iterative method starting from the initial point x0.
+
+    The third argument is the desired value of ||y-T(x)||_Y
+    """
     return KrylovCGNE.solve(self,x0,y,targetDiscrepancy)
 
   def initialize(self,x0,y,targetDiscrepancy):
@@ -269,7 +323,7 @@ class BasicKrylovCGNE(KrylovCGNE):
     indirectly. Or it could be that x0 and y are expressed as dolfin.Function's rather than dolfind.GenericVectors.
     So initialize returns a triple of vectors (x0,y) which are possibly modified versions of the input data.
 
-    The arguments *args are passed directly from 'run'.
+    The arguments \*args are passed directly from 'run'.
     """
     self.targetDiscrepancy = targetDiscrepancy
     return (x0,y)

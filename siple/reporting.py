@@ -49,13 +49,34 @@ def msg(s,*args):
     logFile.write('\n')
     logFile.flush()
 
-def pause():
+def pause(message_in="Computation paused. Press any key to continue.",
+          message_out='Continued'):
   """
   Halt computation until a key is pressed.
   """
-  print ("Computation paused. Press any key to continue.")
+  if not message_in is None:
+    print(message_in)
   getch()
-  print "Continued"
+  if not message_out is None:
+    print message_out
+
+def in_ipython():
+    try:
+        __IPYTHON__
+    except NameError:
+        return False
+    else:
+        return True
+
+def endpause(message_in='Script done. Press any key to continue',message_out=None,
+             python_only=True):
+  """
+  Wait for a keypress after displaying a helpful message. Typically used at 
+  the end of a script.  If python_only=True, the message and wait are skipped
+  when running under ipython.
+  """
+  if (not python_only) or (not in_ipython()):
+    pause(message_in,message_out)
 
 def beep():
   print '\a'

@@ -1,5 +1,13 @@
 siple: a Small Inverse Problems Library
 
+
+*************************************************************************
+Overview:
+
+The siple library is a collection of python based tools for solving
+certain kinds of inverse problems.
+
+
 *************************************************************************
 Installation:
 
@@ -16,18 +24,30 @@ For other options, use
 
 python setup.py install --help
 
-or 
-
-python setup.py --help
+See also the comments at the start of setup.py
 
 
 *************************************************************************
 Documentation:
 
-There is a tutorial (in progress) in the docs directory.
+The documentation is built using sphinx and pdfLaTeX, which must
+be installed.  In particular, see sphinx.pocoo.org.
 
-API documentation using sphinx will be forthcoming.
+To build the HTML API reference:
 
+cd docs
+make html
+
+The documentation can then be accessed via
+
+docs/build/html/index.html
+
+There is also a tutorial (in progress):
+
+cd docs
+make tutorial
+
+which will generate docs/siple_tutorial.pdf
 
 
 *************************************************************************
