@@ -1,0 +1,16 @@
+# distutils build directory
+build
+
+# sphinx build directory
+docs/build
+
+# tex leftovers
+*.aux
+*.log
+
+# tutorial
+docs/siple_tutorial.pdf
+
+# python compiled code
+*.pyc
+
