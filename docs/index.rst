@@ -14,6 +14,8 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
+   tutorial.rst
+
    exceptions.rst
    gradient.rst
    linalg.rst
