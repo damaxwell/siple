@@ -3,29 +3,17 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Siple API
+|siple|
 =================================
 
-Contents:
+The |siple| python package contains algorithms
+for solving certain kinds of inverse problems.
 
-
-:mod:`siple`
 
 .. toctree::
-   :maxdepth: 2
+  :maxdepth: 2
 
-   tutorial.rst
-
-   exceptions.rst
-   gradient.rst
-   linalg.rst
-   opt.rst
-   rand.rst
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+  crashcourse/index.rst
+  tutorial/index.rst
+  api.rst
 
