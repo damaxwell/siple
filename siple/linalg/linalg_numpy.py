@@ -17,10 +17,10 @@ import numpy as np
 class NumpyVector(AbstractVector):
   """Implements the siple.linalg.AbstractVector interface for a numpy array."""
   def __init__(self,u):
-    if not isinstance(u,np.ndarray):
-      raise ValueError("An NumpyVector can only be constructed from a numpy array: found %s" % u)
-    if len(u.shape) != 1:
-      raise ValueError("An NumpyVector can only be constructed from a numpy array of shape (n,): found shape %s" % len(u.shape))
+    if isinstance(u,tuple):
+      u = np.ndarray(u)
+    elif not isinstance(u,np.ndarray):
+      raise ValueError("An NumpyVector can only be constructed from a numpy array or a size specification: found %s" % u)
 
     self._core = u
 
