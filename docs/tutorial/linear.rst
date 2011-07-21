@@ -204,9 +204,9 @@ the following snippet tests the adjoint::
   # Construct some random vectors in the domain and range spaces with
   # coefficients near 1.
   y = NumpyVector((N,))
-  d = RandomVector(y,scale=1)
+  d = random_vector(y,scale=1)
   d.core()[:] -= sum(d.core())/N # zero-mean!
-  r = RandomVector(y,scale=1)
+  r = random_vector(y,scale=1)
   r.core()[:] -= sum(r.core())/N # zero-mean!
 
   # Compute the two inner-products

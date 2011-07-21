@@ -30,25 +30,18 @@ See also the comments at the start of setup.py
 *************************************************************************
 Documentation:
 
-The documentation is built using sphinx and pdfLaTeX, which must
-be installed.  In particular, see sphinx.pocoo.org.
+The documentation (in progress) is built using sphinx, which must
+be installed.  See sphinx.pocoo.org.
 
-To build the HTML API reference:
+To build the documentation:
 
 cd docs
 make html
 
+
 The documentation can then be accessed via
 
 docs/build/html/index.html
-
-There is also a tutorial (in progress):
-
-cd docs
-make tutorial
-
-which will generate docs/siple_tutorial.pdf
-
 
 *************************************************************************
 Examples:
