@@ -62,10 +62,11 @@ class AntiderivativeForwardProblem(LinearForwardProblem):
 class Solver(BasicKrylovCGNE):
   def iterationHook(self,count,x,y,d,r,*args):
     # p = self.forwardProblem().p
-    pp.clf()
-    pp.plot(d.core())
-    pp.draw()
-    pause()
+    # pp.clf()
+    # pp.plot(d.core())
+    # pp.draw()
+    # pause()
+    pass
 
   def solve(self,x,y,targetDisc):
     y = y.copy()
@@ -102,6 +103,8 @@ Example: %prog -L 10 -N 100 -n 0.1"""
                     help='use steepest descent rather than conjugate gradient')
   parser.add_option("-a","--test_adjoint",action='store_true',
                     help='test adjoint and exit')
+  parser.add_option("-d","--discrepancy_fraction",type='float',default=1.0,metavar="D",
+                    help='remove the fraction D of the actual error (D<1 to overfit and D>1 to underfit)')
 
   (options, args) = parser.parse_args()
 
@@ -133,11 +136,12 @@ Example: %prog -L 10 -N 100 -n 0.1"""
     y += siple.rand.random_vector(NumpyVector(y),scale=Linf_error).core()
 
     params = Solver.defaultParameters()
+    params.ITER_MAX = 10000
     params.steepest_descent = options.steepest_descent
 
     x0 = np.zeros(y.shape)
     solver = Solver(forward_problem,params=params)
-    ( xc,yc) = solver.solve(x0,y,L2_error)
+    ( xc,yc) = solver.solve(x0,y,options.discrepancy_fraction*L2_error)
 
     from matplotlib import pyplot as pp
     pp.clf()
