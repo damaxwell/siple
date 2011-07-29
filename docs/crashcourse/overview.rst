@@ -42,7 +42,56 @@ Although a failure of existence or uniqueness causes difficulty,  these
 deficiencies can often be treated by expanding the notion of a solution or specification of extra data.  Dealing with a failure of continuity is
 more problematic and requires a process known as :dfn:`regularization`.
 
+.. _regularization:
 
+Regularization
+^^^^^^^^^^^^^^
+
+Suppose we wish to solve the inverse problem
+
+.. math:: \calF(x) = y
+  :label: invreg
+
+where :math:`y` is known and :math:`x` is to be determined.  We assume
+that :math:`y` is not known exactly, and only an approximation
+:math:`y^\delta` is available.  We also assume that we know something
+about how good an approximation :math:`y^\delta` is of :math:`y`,
+namely :math:`||y-y^\delta||_Y<\delta`. 
+
+If the inverse problem is not continuous, we do not want to solve
+
+.. math:: \calF(x^\delta) = y^\delta
+  :label: invreg_approx
+
+exactly, since small error in :math:`y^\delta` could lead to large
+error (with uncontrolled size) in :math:`x^\delta`.  
+
+A regularization strategy for solving equation :eq:`invreg` is
+a family of maps :math:`R_\delta : Y\rta X` that are approximate
+inverses of :math:`\calF`, one for each error level :math:`\delta`.
+Given an approximation :math:`y^\delta` of :math:`y`,
+
+.. math:: x^\delta = R_\delta(y^\delta)
+
+is the associated approximate solution of equation :eq:`invreg`.  It 
+typically does not solve equation :eq:`invreg_approx` exactly.  However,
+a regularization strategy comes with the following promise
+
+1. For each :math:`\delta` there is a constant :math:`C_\delta` 
+   (depending only on the error estimate :math:`\delta`) such that
+
+   .. math:: ||x-R_\delta(y^\delta)||_X < C_\delta.
+
+2. As :math:`\delta\rta 0`, the constants :math:`C_\delta\rta 0`.
+
+Practically speaking, this means that if we use a regularization strategy
+:math:`R_\delta` that matches the error in :math:`y^\delta`, then
+our approximate solution :math:`x^\delta` will not be too far from :math:`x` (no further than :math:`C_\delta` away), and improvements in our approximations :math:`y^\delta` will lead to improvements in our approximate
+solutions :math:`x^\delta`.
+
+The principal regularization algorithms in the |siple| library
+employ the so-called Morozov discrepancy principle, as described in
+the following section on :ref:`gradient methods <gradient>`.
 
 
 

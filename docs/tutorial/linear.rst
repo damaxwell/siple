@@ -275,7 +275,7 @@ On exit, we add the means back in and extract the
 :class:`numpy.ndarray`\s.
 
 The classes described here for solving the derivative problem can be found
-in the script :file:`examples/derivative.py`, which also contains code
+in the script :file:`examples/e1/derivative.py`, which also contains code
 for performing a sample inversion.
 
 From the shell, use::
@@ -284,9 +284,9 @@ From the shell, use::
 
 to see options for running the script.  For example, ::
 
-  python derivative.py -L 10 -N 40 -n 0.2
+  python derivative.py -L 10 -N 80 -n 0.2
 
-performs an inversion on an interval of length 10 with 40 subintervals
+performs an inversion on an interval of length 10 with 80 subintervals
 and random errors with standard deviation 0.2 added to the input to the
 inverse problem, and results in the following graph
 
@@ -301,7 +301,11 @@ solve
 The red curve is the approximate solution :math:`g` and the green curve
 is its antiderivative :math:`T g`, which is an approximation of :math:`G`.
 
+In this inversion, the Morozov discrepancy principle is use as the regularization strategy.  If the algorithm is run too far by using an estimate of the error level that is too small, then the quality of the inversion suffers.  The :data:`-d` option can be used to see this effect. For example, ::
 
+  python derivative.py -L 10 -N 80 -n 0.2 -d 0.5
 
-  
+indicates that the algorithm should be run using an estimate for the error that is 0.5 times is actual value, and hence too small.  This leads to the following reconstruction where the curve for :math:`G` is fitted more accurately at the expense of high frequencies in the associated derivative.
+
+.. image:: deriv_sol_overfit.png
 

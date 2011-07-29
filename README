@@ -49,4 +49,4 @@ Examples:
 The scripts in the examples directory use siple to solve inverse problems 
 described in the tutorial.  See the comments at the beginning of each example to see a brief description of what is being done, and run the example with, e.g., 
 
-python examples/derivative.py
+python examples/e1/derivative.py

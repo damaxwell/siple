@@ -15,5 +15,6 @@ for solving certain kinds of inverse problems.
 
   crashcourse/index.rst
   tutorial/index.rst
+  howto/index.rst
   api.rst
 

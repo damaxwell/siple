@@ -3,8 +3,6 @@ from siple.gradient.forward import LinearForwardProblem
 from siple.gradient.linear import  BasicKrylovCGNE
 from siple.linalg.linalg_numpy import NumpyVector
 import numpy as np
-from scipy import sparse
-from scipy.sparse.linalg import spsolve
 from siple.reporting import pause, endpause
 from matplotlib import pyplot as pp
 

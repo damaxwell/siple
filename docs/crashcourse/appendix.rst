@@ -30,6 +30,8 @@ All of these formulas are analogues of the familiar Euclidean ones.
 A vector space equipped with an inner product is called an
 inner product space.
 
+.. _adjoints:
+
 Adjoints
 ^^^^^^^^
 
@@ -60,6 +62,7 @@ computation of the adjoint of a particular linear map is a nontrivial task.
 For maps involving differential equations, it often involves integration by 
 parts formulas, and there are examples of these in the :ref:`tutorial`.
 
+.. _derivatives:
 
 Derivatives
 ^^^^^^^^^^^^^^
@@ -77,7 +80,7 @@ in the direction :math:`h=(0,1)` is
 
 It would perhaps be more familiar to write this as 
 
-.. math:: \left.\frac{\partial}{\partial x_2} \calF(x_1,x_2)\right|_{x=(2,3)},
+.. math:: \left.\frac{\partial}{\partial x_2} \calF(x_1,x_2)\right|_{x=(2,3)}
 
 but the more general notation is helpful when :math:`X` doesn't have a preferred basis like :math:`\Reals^2` does.  
 
@@ -143,6 +146,8 @@ and setting :math:`t=0` we see
 Unraveling everything we have just done, we see that :math:`\calF'_f(h)`
 is the solution :math:`w` of equations :eq:`linearized`, where :math:`u=\calF(f)`.
 
+
+.. _gradients:
 
 Gradients
 ^^^^^^^^^^^^^^
