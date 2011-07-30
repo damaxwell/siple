@@ -62,3 +62,8 @@ class NumpyVector(AbstractVector):
       return np.linalg.norm(self._core,1)
     if name == 'linf':
       return np.linalg.norm(self._core,np.inf)
+  
+  def __repr__(self):
+    return self._core.__repr__()
+  def __str__(self):
+    return self._core.__str__()

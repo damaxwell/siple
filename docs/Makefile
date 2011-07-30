@@ -20,7 +20,6 @@ help:
 	@echo "  latex      to make LaTeX files, you can set PAPER=a4 or PAPER=letter"
 	@echo "  changes    to make an overview of all changed/added/deprecated items"
 	@echo "  linkcheck  to check all external links for integrity"
-	@echo "  tutorial   to build the (LaTeX) siple tutorial"
 
 all: html tutorial
 
@@ -51,23 +50,6 @@ define run-latex
 	egrep -i "(Reference|Citation).*undefined" $(<:%.tex=%.log) ; true
 endef
 
-define run-pdflatex
-	LATEX=pdflatex
-	@$(run-latex)
-endef
-
-
-TEX_SRC = siple_tutorial.tex
-PDF	= $(TEX_SRC:%.tex=%.pdf)
-
-clean	::
-	  rm -f $(PDF) $(TEX_SRC:%.tex=%.aux) $(TEX_SRC:%.tex=%.log) 
-
-$(PDF) : %.pdf : %.tex
-	pdflatex $<
-	pdflatex $<
-
-tutorial : $(PDF) 
 
 changes:
 	$(SPHINXBUILD) -b changes $(ALLSPHINXOPTS) $(BUILDDIR)/changes

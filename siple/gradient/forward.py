@@ -159,7 +159,7 @@ class NonlinearForwardProblem(LinearForwardProblem):
     """
     Helper method for determining the the forward linearziation has been coded correctly.
     
-    Returns the difference quotient (F(x+th)-F(x))/t and the value T(x,h).  If the linearization
+    Returns the difference quotient (F(x+th)-F(x))/t and the value T(h).  If the linearization
     has been coded correctly, these vectors should be close to each other.
     """
     xp = x.copy()
@@ -251,7 +251,7 @@ class ForwardProblemLineSearchAdaptor:
     except Exception as e:
       msg('Exception during evaluation of linesearch at t=%g;\n%s',t,str(e))
       return (numpy.nan,numpy.nan,None)
-    forward_problem.T(d,out=self.Td)
+    self.Td=forward_problem.T(d,out=self.Td)
 
     self.r -= self.Fz
     J = 0.5*forward_problem.rangeIP(self.r,self.r)

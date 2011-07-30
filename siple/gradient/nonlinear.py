@@ -195,7 +195,6 @@ class InvertIGN:
         Td = forward_problem.T(d,out=Td)
         Jp = -forward_problem.rangeIP(Td,residual)
 
-      
         if Jp >= 0:
           theta *= self.params.kappaTrust
           msg('Model problem found an uphill direction.  Shrinking theta to %g.',theta)
@@ -361,7 +360,7 @@ class InvertNLCG:
   def solve( self, x, y, *args ):
     (x,y) = self.initialize(x,y,*args)
 
-    self.discrepancy_history=[]
+    # self.discrepancy_history=[]
 
     forward_problem = self.forwardProblem()
     cg_reset = x.size()
@@ -403,7 +402,7 @@ class InvertNLCG:
       # Main loop
       count = 0
       while True:
-        self.discrepancy_history.append(sqrt(2*Jx))
+        # self.discrepancy_history.append(sqrt(2*Jx))
 
         if count > self.params.ITER_MAX:
           raise IterationCountFailure(self.params.ITER_MAX)
@@ -428,18 +427,18 @@ class InvertNLCG:
             t = 1/(self.params.deriv_eps-Jp);
             prevLineSearchFailed = True;
             continue      
-        
+
         prevLineSearchFailed = False;
 
         t = line_search.value.t;
         x.axpy(t,d)
         TStarRLast.set(TStarR)
-      
-        forward_problem.evalFandLinearize(x,out=Fx,guess=Fx)
+
+        Fx = forward_problem.evalFandLinearize(x,out=Fx,guess=Fx)
         residual.set(y)
         residual -= Fx
-        
-        forward_problem.TStar(residual,out=TStarR)
+
+        TStarR = forward_problem.TStar(residual,out=TStarR)
 
         Jx = 0.5*forward_problem.rangeIP(residual,residual)
 
@@ -459,7 +458,8 @@ class InvertNLCG:
         JpLast = Jp
         Jp =  -forward_problem.domainIP(TStarR,d)
         if Jp >=0:
-          msg('found an uphill direction; resetting!');
+          if self.params.verbose:
+            msg('found an uphill direction; resetting!');
           d.set(TStarR)
           Jp = -forward_problem.domainIP(TStarR,d);
           t0 = Jx/(self.params.deriv_eps-Jp);
@@ -468,7 +468,64 @@ class InvertNLCG:
     except Exception as e:
       # Store the current x and y values in case they are interesting to the caller, then
       # re-raise the exception.
+      # import traceback
+      # traceback.print_exc()
       self.finalState = self.finalize(x,Fx)
       raise e
 
     return self.finalize(x, Fx)
+
+class BasicInvertNLCG(InvertNLCG):
+  """Inversion of a forward problem using nonlinear conjugate gradient minimization
+  and the Morozov discrepancy principle."""
+  
+  def __init__(self,forward_problem,params=None):
+    InvertNLCG.__init__(self,params=params)
+    self.forward_problem = forward_problem
+    
+  def forwardProblem(self):
+    """
+    Returns the NonlinearForwardProblem that defines the inverse problem. 
+    """
+    return self.forward_problem
+
+  def solve(self,x0,y,targetDiscrepancy):
+    """
+    Run the iterative method starting from the initial point x0.
+
+    The third argument is the desired value of ||y-T(x)||_Y
+    """
+    return InvertNLCG.solve(self,x0,y,targetDiscrepancy)
+
+  def initialize(self,x0,y,targetDiscrepancy):
+    """
+    This method is a hook called at the beginning of a run.  It gives an opportunity for the class to 
+    set up information needed to decide conditions for the final stopping criterion.
+
+    It may be that the initial data 'x0' expresses the the initial data for the problem T(x)=y
+    indirectly. Or it could be that x0 and y are expressed as dolfin.Function's rather than dolfind.GenericVectors.
+    So initialize returns a triple of vectors (x0,y) which are possibly modified versions of the input data.
+
+    The arguments \*args are passed directly from 'run'.
+    """
+    self.targetDiscrepancy = targetDiscrepancy
+    return (x0,y)
+
+  def stopConditionMet(self,count,x,Fx,y,r):
+    """
+    Determines if minimization should be halted (based, e.g. on a Morozov discrepancy principle)
+
+    In: count: current iteration count
+        x:     point in domain of potential minimizer.
+        Fx:    value of nonlinear function at x
+        y:     desired value of F(x)
+        r:     current residual    
+    """
+    J = sqrt(abs(self.forward_problem.rangeIP(r,r)));
+    Jgoal = self.params.mu*self.targetDiscrepancy
+    
+    msg('(%d) J=%g goal=%g',count,J,Jgoal)
+    
+    return J <= Jgoal
+
+  

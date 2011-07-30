@@ -1,9 +1,6 @@
-********
-gradient
-********
-
-:mod:`gradient`
-=======================
+****************
+gradient.forward
+****************
 
 .. automodule:: siple.gradient.forward
     :members:

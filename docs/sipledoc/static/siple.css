@@ -3,10 +3,14 @@
 
 
 dl.class, dl.function {
-    border-top: 2px solid #888;
+    margin-top: 40px;
+    padding-top: 15px;
+    border-top: 4px solid #888;
 }
 
 dl.method, dl.attribute {
+    padding-top: 5px;
+    margin-top: 20px;
     border-top: 1px solid #aaa;
 }
 

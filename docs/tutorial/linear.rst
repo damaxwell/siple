@@ -173,6 +173,8 @@ zero-mean function by subtracting off its mean::
 Many methods in |siple| use the convention that storage for the output may have been previously allocated and is passed in with the keyword argument :data:`out`.  If it hasn't already been allocated (i.e. if :data:`out is None`), it needs to be allocated by the the method.  Regardless of whether
 the storage was previously allocated or not, it needs to be returned as the function value.
 
+.. _TStar:
+
 Since :math:`T^*=-T`, we can can reuse the code we've already written to
 specify the adjoint::
 

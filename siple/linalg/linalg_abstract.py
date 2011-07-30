@@ -31,7 +31,7 @@ class AbstractVector:
     class as the current vector, an exception may be thrown.
     """
     if isinstance(rhs,AbstractVector):
-      self._set_from_abstract(self,rhs)
+      self._set_from_abstract(rhs)
     else:
       self._set_from_array(rhs)
   
@@ -123,7 +123,7 @@ class AbstractVector:
   def norm(self,name):
     """Returns a norm of the vector.  The string name describes the desired
     norm (e.g. 'l1', 'l2', 'linf').  There is no guarantee that an AbstractVector
-    has a notion of any particular norm. Use with caution"""
+    has a notion of any particular norm. Use with caution."""
     raise NotImplementedError()
 
   def __imul__(self,t):
