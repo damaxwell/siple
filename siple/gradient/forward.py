@@ -18,31 +18,32 @@ class LinearForwardProblem:
   """
   We are interested in solving an ill-posed problem
   
-         T(x) = y
+  .. math::          T(x) = y
          
-  where T:X->Y is a nonlinear map between Hilbert spaces.  One class of methods
+  where :math:`T:X\\rta Y` is a linear map between Hilbert spaces.  One class of methods
   for solving such a problem involve iteratively methods that approximately minimize
   
-    J(x)  = 1/2 || y - T(x) ||^2_Y
+  .. math::  J(x)  = || y - T(x) ||^2_Y
         
   These techniques require the following maps: 
   
       The forward problem: T
+
       the adjoint of T:    T*
-      
+
   This class encapsulates the solution of all these maps for a single forward problem,
   as well as defining the norms on the domain and range spaces.
   """
 
   def T(self,x,out=None):
     """
-    Implements the forward linear problem.  Returns T(x) in the variable out.
+    Implements the forward linear problem.  Returns T(x) in the variable :data:`out`.
     """
     raise NotImplementedError()
 
   def TStar(self,y,out=None):
     """
-    Implements the adjoint of the forward linear problem.  Returns T^*(y) in the variable out.
+    Implements the adjoint of the forward linear problem.  Returns T^*(y) in the variable :data:`out`.
     """
     raise NotImplementedError()
 
@@ -65,6 +66,7 @@ class LinearForwardProblem:
     Returns the following inner products:
 
       <T(d),r>_Y
+
       <d,T*(r)>_X
 
     If the linearization is correct and its adjoint is correct, then these should be the same number.
