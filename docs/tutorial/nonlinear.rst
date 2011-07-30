@@ -324,6 +324,20 @@ and random errors with (pointwise) standard deviation 0.001 added to the input t
 .. image:: coeff_sol.png
 
 
+The |siple| library classes support a basic parameter mechanism for
+supporting the myriad parameters that are associated with a numerical method.
+Some classes offer a static :func:`defaultParameters` method that
+can be used to obtain a dictionary of parameters.  These can be adjusted, and then passed as an argument to the class's constructor.  For example, ::
+
+  siple.gradient.nonlinear import BasicInvertNLCG
+  forward_problem = CoeffForwardProblem(N)
+  params = BasicInvertNLCG.defaultParameters()
+  params.steepest_descent = True
+  params.ITER_MAX = 500
+  solver = BasicInvertNLCG(forward_problem,params=params)
+
+constructs a :class:`BasicInvertNLCG <siple.nonlinear.BasicInvertNLCG>` but instructs it that it should use the steepest descent algorithm (which is a trivial but slower modification of the conjugate gradient algorithm) and increases the allowed number of iterations to 500 before a failed inversion is declared.
+
 .. _fem:
 
 As promised, here is the remaining code for the forward problem that implements the finite-element method::

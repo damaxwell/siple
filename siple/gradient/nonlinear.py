@@ -24,9 +24,9 @@ class InvertIGN:
   """
   Implements solving an ill-posed minimization problem of the form
   
-      J(x) = 1/2 B(y-F(x),y-F(x))
+  .. math::       J(x) = B(y-\calF(x),y-\calF(x))
 
-  where B is a symmetric positive semidefinite bilinear form and F is a (possibly nonlinear) function mapping between
+  where :math:`B` is a symmetric positive semidefinite bilinear form and :math:`\calF` is a (possibly nonlinear) function mapping between
   two Hilbert spaces.
 
   Minimization is done applying an incomplete Gauss-Newton algorithm until a stopping criterion is met.
@@ -34,6 +34,18 @@ class InvertIGN:
 
   @staticmethod
   def defaultParameters():
+    """Default parameters that can subsequently be modified and passed to the constructor.
+
+    :param ITER_MAX: maximum number of minimization iterations before failure
+    :param mu: Morozov discrepancy principle scaling paramter
+    :param cg_reset: number of iterations before a conjugate gradient reset (0=default)
+    :param thetaMin: smallest acceptable goal improvment for linearized step
+    :param thetaMax: maximum attempted goal improvment for linearized step
+    :param kappaTrust: factor to shrink :data:`theta` by when linearized step fails
+    :param rhoLow: linearized step fails when goal improves by less than :data:`rhoLow`*:data:`theta`
+    :param rhoHigh: linearized step is very successful when goal improves by more than :data:`rhoHigh`*:data:`theta`
+    :param verbose: True if extra logging output is desired
+    """
     params = Parameters('InvIGN', ITER_MAX=200, mu=1.1, cg_reset=0, thetaMin=2**(-20), thetaMax=0.5, 
                                         kappaTrust=0.5, rhoLow=0.1, rhoHigh=0.5, verbose=False)
 
@@ -72,11 +84,10 @@ class InvertIGN:
     For example, x and y might be dolfin (finite element) Functions; this method should return 
     the associated dolfin GenericVectors.
 
-    The remaining arguments are passed directly from 'solve', and might be used for determining the
+    The remaining arguments are passed directly from :func:`solve`, and might be used for determining the
     final stopping criterion.
 
-    Returns dolfin vectors corresponding to the initial value of x and the desired value of y=F(x) as
-    well as a target discrepancy.
+    Returns vectors corresponding to the initial value of *x* and the desired value of *y=F(x)*.
     """
     raise NotImplementedError()
 
@@ -86,20 +97,20 @@ class InvertIGN:
     signifies in a class-defined way the difference between the currently computed value of F(x)
     and the desired value y.  Typically it will be
     
-        discrepancy = ||y-F(x)||_Y
+    .. math::         {\\rm discrepancy} = ||y-\calF(x)||_Y
         
     but there are scenarios where some other scalar is maintained.  During each linear step of
     the computations, a fraction of the discrepancy is eliminated.
 
-    In: x: The current point in the domain.
-        y: The desired value of F(x)
-        r: The residual y-F(x)
+    :param x: The current point in the domain.
+    :param y: The desired value of F(x)
+    :param r: The residual y-F(x)
     """
     return sqrt(abs(self.forwardProblem().rangeIP(r,r)))
     
   def forwardProblem(self):
     """
-    Returns the NonlinearForwardProblem that defines the maps F, T, T*, and the inner products on the 
+    Returns the :class:`NonlinearForwardProblem` that defines the maps F, T, T*, and the inner products on the 
     domain and range.
     """
     raise NotImplementedError()
@@ -108,6 +119,7 @@ class InvertIGN:
     pass
 
   def linearInverseSolve(self,x,y,r,discrepancyLin):
+    """Internal method for solving the linearized inverse problems."""
     x0 = x.zero_like()
     
     forward_problem = self.forwardProblem()
@@ -117,7 +129,7 @@ class InvertIGN:
     
   def finalize(self,x,y):
     """
-    Hook called at the end of 'solve'.  Gives the chance to massage the return values.
+    Hook called at the end of :func:`solve`.  Gives the chance to massage the return values.
     """
     return (x,y)
 
@@ -133,8 +145,10 @@ class InvertIGN:
   ##
   ########################################################################################################
 
-  def solve( self, x, y, *args ):
-    (x,y,targetDiscrepancy) = self.initialize(x,y,*args)
+  def solve( self, x0, y, *args ):
+    """Main routine to solve the inverse problem F(x)=y.  Initial guess is x=x0.
+    Extra arguments are passed to :func:`initialize`."""
+    (x,y,targetDiscrepancy) = self.initialize(x0,y,*args)
 
     self.discrepancy_history=[]
 
@@ -262,16 +276,15 @@ class InvertIGN:
     return self.finalize(x, Fx)
 
 class InvertNLCG:
-  """
-  Implements solving an ill-posed minimization problem of the form
+  """Implements solving an ill-posed minimization problem of the form
   
-      J(x) = 1/2 B(y-F(x),y-F(x))
+.. math::     J(x) = B(y-F(x),y-F(x))
 
-  where B is a symmetric positive semidefinite bilinear form and F is a (possibly nonlinear) function mapping between
-  two Hilbert spaces.
+where B is a symmetric positive semidefinite bilinear form and F is a (possibly nonlinear) function mapping between
+two Hilbert spaces.
 
-  Minimization is done applying a nonlinear conjugate gradient algorithm until a stopping criterion is met.
-  """
+Minimization is done applying a nonlinear conjugate gradient algorithm until a stopping criterion is met.
+"""
 
 
   ###################################################################################
@@ -291,11 +304,12 @@ class InvertNLCG:
     """
     Determines if minimization should be halted (based, e.g. on a Morozov discrepancy principle)
     
-    In: count: current iteration count
-        x:     point in domain of potential minimizer.
-        Fx:    value of nonlinear function at x
-        y:     desired value of F(x)
-        r:     current residual    
+    In: 
+        * count: current iteration count
+        * x:     point in domain of potential minimizer.
+        * Fx:    value of nonlinear function at x
+        * y:     desired value of F(x)
+        * r:     current residual    
     """
     raise NotImplementedError()
 
@@ -322,6 +336,7 @@ class InvertNLCG:
   def finalize(self,x,y):
     """
     Hook called at the end of 'solve'.  Gives the chance to massage the return values.
+    By default returns (x,y).
     """
     return (x,y)
 
@@ -331,12 +346,14 @@ class InvertNLCG:
 
   @staticmethod
   def defaultParameters():
-    """
-    Parameters:
-      ITER_MAX: maximum iteration count
-      mu: scaling parameter for Morozov discrepency principle.
-      cg_reset: reset conjugate gradient method after this many iterations.  Zero for a default behaviour.
-      steepest_descent: Use steepest descent rather than full NLCG
+    """Parameters:
+      
+      * ITER_MAX: maximum iteration count
+      * mu: scaling parameter for Morozov discrepency principle.
+      * cg_reset: reset conjugate gradient method after this many iterations.  Zero for a default behaviour.
+      * steepest_descent: Use steepest descent rather than full NLCG
+      * linesearch: parameters to be passed to the linesearch algorithm
+      * verbose: print out extra output
     """
     params = Parameters('InvNLCG', ITER_MAX=200, mu=1.1, cg_reset=0, deriv_eps=1, steepest_descent=False, verbose=False)
     lsparams = linesearchHZ.LinesearchHZ.defaultParameters()
@@ -357,8 +374,11 @@ class InvertNLCG:
     """
     self.iteration_listeners.append(listener)
 
-  def solve( self, x, y, *args ):
-    (x,y) = self.initialize(x,y,*args)
+  def solve( self, x0, y, *args ):
+    """Solve the inverse problem F(x)=y.  The initial estimate is x=x0.
+    Any extra arguments are passed to :func:`initialize`.
+    """
+    (x,y) = self.initialize(x0,y,*args)
 
     # self.discrepancy_history=[]
 
@@ -468,8 +488,8 @@ class InvertNLCG:
     except Exception as e:
       # Store the current x and y values in case they are interesting to the caller, then
       # re-raise the exception.
-      # import traceback
-      # traceback.print_exc()
+      import traceback
+      traceback.print_exc()
       self.finalState = self.finalize(x,Fx)
       raise e
 
@@ -491,9 +511,9 @@ class BasicInvertNLCG(InvertNLCG):
 
   def solve(self,x0,y,targetDiscrepancy):
     """
-    Run the iterative method starting from the initial point x0.
+    Run the iterative method starting from the initial point *x0*.
 
-    The third argument is the desired value of ||y-T(x)||_Y
+    The third argument is the desired value of :math:`||y-T(x)||_Y`
     """
     return InvertNLCG.solve(self,x0,y,targetDiscrepancy)
 
@@ -515,11 +535,12 @@ class BasicInvertNLCG(InvertNLCG):
     """
     Determines if minimization should be halted (based, e.g. on a Morozov discrepancy principle)
 
-    In: count: current iteration count
-        x:     point in domain of potential minimizer.
-        Fx:    value of nonlinear function at x
-        y:     desired value of F(x)
-        r:     current residual    
+    In: 
+        * count: current iteration count
+        * x:     point in domain of potential minimizer.
+        * Fx:    value of nonlinear function at x
+        * y:     desired value of F(x)
+        * r:     current residual    
     """
     J = sqrt(abs(self.forward_problem.rangeIP(r,r)));
     Jgoal = self.params.mu*self.targetDiscrepancy
