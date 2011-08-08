@@ -73,10 +73,10 @@ the :dfn:`directional derivative` of :math:`\calF` at :math:`x` in the direction
 .. math:: \calF'_x(h) = \left. \frac{d}{dt} \right|_{t=0} \calF(x+th).
 
 For example, if :math:`\calF(x_1,x_2)=\cos(x_1 x_2^2)` 
-then the directional derivative of :math:`\calF` at :math:`x=(2,3)`
+then the directional derivative of :math:`\calF` at :math:`x=(5,3)`
 in the direction :math:`h=(0,1)` is 
 
-.. math:: \left. \frac{d}{dt} \right|_{t=0} \cos( 2\cdot(3+t)^2) = \left.-\sin(2\cdot(3+t))\cdot(3+t)\right|_{t=0} =  -3 \sin(6).
+.. math:: \left. \frac{d}{dt} \right|_{t=0} \cos( 5\cdot(3+t)^2) = \left.-\sin(5\cdot(3+t)^2)\cdot 5\cdot 2\cdot(3+t)\right|_{t=0} =  -30 \sin(45).
 
 It would perhaps be more familiar to write this as 
 

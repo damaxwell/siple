@@ -2,7 +2,7 @@
 #
 #  This file is a part of siple.
 #
-#  Copyright 2010 David Maxwell
+#  Copyright 2010-2011 David Maxwell
 #
 #  siple is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -17,6 +17,11 @@ import os.path
 
 logFile = None
 def logToFile(b):
+  """Indicates if |siple| output should be saved to a log file.  If *b* is a file name, output
+  is saved there.  Otherwise *b* should be a boolean.  If it is :data:`True`, the log file name
+  is taken from the name of the calling python file (with '.py' replaced with '.log').
+  If *b* is :data:`False` then file logging is turned off.
+  """
   global logFile
   if isinstance(b,str):
     logFile = file(string,'w')
@@ -29,25 +34,87 @@ def logToFile(b):
       if not logFile is None:
         logFile.close()
       logFile = None
-      
+
+kPRATTLE=4
+kDEBUG=3
+kMESSAGE=2
+kWARNING=1
+kERROR=0
+kSeverityDesc = [ "Error", "Warning", "Message", "DEBUG", "BLAHBLAH"]
+
+# Default loggers
+def logprint(message,severity):
+  print message
+  if severity <= kWARNING:
+    beep()
+
+def logfile(message,severity):
+  global logFile
+  if not logFile is None:
+    logFile.write(message)
+    logFile.write('\n')
+    logFile.flush()
+
+loggers = [ logprint, logfile ]
+
+def clear_loggers():
+  global loggers
+  loggers = []
+
+def add_logger(logger):
+  global loggers
+  loggers.append(logger)
+
+def _format_message(caller_level,severity,s,*args):
+  framerec = inspect.stack()[1+caller_level]
+  calling_module = inspect.getmodule(framerec[0])
+  f=inspect.getouterframes(inspect.currentframe())[1+caller_level]
+  caller_name = os.path.basename(f[1])
+  if isinstance(f[3],str):
+    caller_name += (':%s' % f[3])
+  if severity == kMESSAGE:
+    sevdesc = ""
+  else:
+    sevdesc = "(%s)" % kSeverityDesc[severity]
+  
+  message = '%s:%s %s' % (caller_name, sevdesc, s % args)
+  return message
+
+format_message = _format_message
+def set_message_formatter(formatter):
+  global format_message
+  format_message = formatter
 
 def msg(s,*args):
   """
   Print a nicely formatted message.
   """
-  global logFile
-  framerec = inspect.stack()[1]
-  calling_module = inspect.getmodule(framerec[0])
-  f=inspect.getouterframes(inspect.currentframe())[1]
-  caller_name = os.path.basename(f[1])
-  if isinstance(f[3],str):
-    caller_name += (':%s' % f[3])
-  message = '%s: %s' % (caller_name, s % args)
-  print( message )
-  if not logFile is None:
-    logFile.write(message)
-    logFile.write('\n')
-    logFile.flush()
+  global loggers
+  caller_level = 1
+  severity=kMESSAGE
+  message = format_message(caller_level,severity,s,*args)
+  for l in loggers:
+    l(message,severity)
+
+def prattle(s,*args):
+  """
+  Print a nicely formatted message.
+  """
+  global loggers
+  caller_level=1
+  severity=kPRATTLE
+  message = _format_message(caller_level,severity,*args)
+  for l in loggers:
+    l(message,severity)
+
+def debug(s,*args):
+  global loggers
+  caller_level=1
+  severity=kDEBUG
+  message = _format_message(caller_level,severity,*args)
+  for l in loggers:
+    l(message,severity)
+
 
 def pause(message_in="Computation paused. Press any key to continue.",
           message_out='Continued'):
@@ -61,6 +128,7 @@ def pause(message_in="Computation paused. Press any key to continue.",
     print message_out
 
 def in_ipython():
+    "Determines if the python interpreter is ipython."
     try:
         __IPYTHON__
     except NameError:
@@ -79,6 +147,7 @@ def endpause(message_in='Script done. Press any key to continue',message_out=Non
     pause(message_in,message_out)
 
 def beep():
+  "Beeps."
   print '\a'
 
 

@@ -3,8 +3,9 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-|siple|
-=================================
+|siple| 
+=======
+**(a small inverse problems library)**
 
 The |siple| python package contains algorithms
 for solving certain kinds of inverse problems.
