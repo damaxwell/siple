@@ -94,7 +94,7 @@ From equations :eq:`Gadj1` and :eq:`Gadj2` it follows that
 
 Hence :math:`G^*=G`.  We conclude that 
 
-.. math:: (\calF_\beta')(g) = H^*(G^*(g)) = -e^{\beta u} v
+.. math:: (\calF_\beta')^*(g) = H^*(G^*(g)) = -e^{\beta}u v
 
 where :math:`v` is periodic and solves
 
@@ -169,7 +169,7 @@ The forward problem map :math:`\calF` is implemented via::
     return out
 
 The differential equation :eq:`sturm` involves a derivative term that does not
-depend on :math:`\beta`, a low order term that does depend on :math:`\beta`, and a fixed right-hand side that is independent of :math:`\beta`.  The matrix for the derivative terms is preassembled in :data:`self.A`, as is the right-hand side in :data:`self.Frhs`.  The call to :func:`assemble_mass`
+depend on :math:`\beta`, a low order term that does depend on :math:`\beta`, and a fixed right-hand side that is independent of :math:`\beta`.  The matrix for the derivative terms is preassembled in :data:`self.A`, as is the right-hand side in :data:`self.Frhs`.  The call to :func:`assemble_low_order`
 constructs the part of the system matrix corresponding to the low-order
 terms that do depend on :math:`\beta`, and we save the system matrix for future use since both the linearization of :math:`\calF` and its adjoint require it.  For nonlinear problems, it is frequently useful to have an initial guess for the solution, and this can be passed to :func:`F` with the :data:`guess` keyword argument.  In this case, the underlying differential equation is linear and there is no need to make use of an initial guess, so we ignore the argument.  The :data:`out` keyword argument allows the method to make  efficient reuse of storage if possible.  This mechanism is undermined by  :func:`spsolve`, which does not allow a preallocated output variable to be specified.  Hence there is an unfortunate memory allocation (in :func:`spsolve`) and subsequent a copy to :data:`out`.
 
