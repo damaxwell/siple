@@ -292,7 +292,7 @@ We regularize the problem by minimizing
 
 with the nonlinear conjugate gradient algorithm, using the Morozov discrepancy principle stopping criterion. This can be done with a :class:`BasicInvertNLCG <siple.gradient.nonlinear.BasicInvertNLCG>` object. ::
 
-  siple.gradient.nonlinear import BasicInvertNLCG
+  from siple.gradient.nonlinear import BasicInvertNLCG
   forward_problem = CoeffForwardProblem(N)
   solver = BasicInvertNLCG(forward_problem)
   # intial guess in *beta0*, observed function in *u*
@@ -301,6 +301,16 @@ with the nonlinear conjugate gradient algorithm, using the Morozov discrepancy p
 This finds an approximate solution :data:`betac` to the inverse problem
 and for convenience returns the corresponding approximate solution 
 :data:`uc` of the differential equation.
+
+Alternatively, one can use the incomplete Gauss-Newton algorithm
+simply by replacing the solver type.  The forward problem implementation
+remains the same. ::
+
+  from siple.gradient.nonlinear import BasicInvertIGN
+  forward_problem = CoeffForwardProblem(N)
+  solver = BasicInvertIGN(forward_problem)
+  # intial guess in *beta0*, observed function in *u*
+  (betac,uc) = solver.solve(beta0,u,discrepancy)
 
 The observed data :data:`u` is an argument to :func:`solve`, as is an 
 initial estimate :data:`beta0` for the coefficient to be determined.  The remaining argument :data:`discrepancy` specifies the amount of error in the :data:`u`.  A solution is found only to within this level of error, which then
@@ -323,6 +333,12 @@ and random errors with (pointwise) standard deviation 0.001 added to the input t
 
 .. image:: coeff_sol.png
 
+The script supports using three different algorithms for solving the 
+inverse problem.  The nonlinear conjugate gradient algorithm
+is the default, and is selected explicitly with :data:`--algorithm nlcg`.
+Use :data:`--algorithm sd`
+or :data:`--algorithm ign` for the steepest descent and incomplete
+Gauss-Newton algorithms.
 
 The |siple| library classes support a basic parameter mechanism for
 supporting the myriad parameters that are associated with a numerical method.

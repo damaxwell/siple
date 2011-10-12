@@ -51,7 +51,7 @@ def addnoise(u,relative_percent_error,seed=None):
   noisy_u = u.copy()    
   max_u = u.norm('linf')
 
-  scale = (relative_percent_error/100.*maxu)
+  scale = (relative_percent_error/100.*max_u)
   noisy_u += random_vector(u,scale=scale,seed=seed)
 
   return (nu,scale)

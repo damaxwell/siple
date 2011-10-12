@@ -1,6 +1,6 @@
 import siple
 from siple.gradient.forward import NonlinearForwardProblem
-from siple.gradient.nonlinear import BasicInvertNLCG
+from siple.gradient.nonlinear import BasicInvertNLCG, BasicInvertIGN
 from siple.linalg.linalg_numpy import NumpyVector
 import numpy as np
 from scipy import sparse
@@ -185,8 +185,8 @@ Example: %prog -L 10 -N 100 -n 0.1"""
                     help='number of subintervals')
   parser.add_option("-n","--l_infty_noise",type='float',default=0.001,
                     help='standard deviation of added noise')
-  parser.add_option("-s","--steepest_descent",action='store_true',
-                    help='use steepest descent rather than conjugate gradient')
+  parser.add_option("-a","--algorithm",type='choice',choices=['sd','nlcg','ign'],default='nlcg',
+                    help="algorithm to use [sd,nlcg,ign]: sd=steepest descent, nlcg=nonlinear conjugate gradient (default), ign=incomplete Gauss-Newton")
   parser.add_option("-t","--test_linearization",action='store_true',
                     help='test linearization and adjoint (and exit)')
   parser.add_option("-d","--discrepancy_fraction",type='float',default=1.0,metavar="D",
@@ -221,10 +221,16 @@ Example: %prog -L 10 -N 100 -n 0.1"""
     u += siple.rand.random_vector(u,scale=Linf_error)
     L2_error = Linf_error
 
-    params = BasicInvertNLCG.defaultParameters()
+    if options.algorithm == 'ign':
+      Solver = BasicInvertIGN
+    else:
+      Solver = BasicInvertNLCG
+      
+    params = Solver.defaultParameters()
     params.ITER_MAX = 10000
-    params.steepest_descent = options.steepest_descent
-    solver = BasicInvertNLCG(forward_problem,params=params)
+    if options.algorithm == 'sd':
+      params.steepest_descent = True
+    solver = Solver(forward_problem,params=params)
 
     beta0 = u_true.zero_like()
     (betac,uc) = solver.solve(beta0,u,options.discrepancy_fraction*L2_error)
@@ -237,5 +243,5 @@ Example: %prog -L 10 -N 100 -n 0.1"""
     pp.plot(x,beta.core(),x,betac.core())
     pp.legend(('True $\\beta$', 'Computed $\\beta$'))
     pp.draw()
-
+    
     endpause()

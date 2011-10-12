@@ -18,3 +18,6 @@ for solving certain kinds of inverse problems.
   tutorial/index.rst
   api/index.rst
 
+
+Development of this library was supported in part by the National
+Science Foundation (grant 0724860) and NASA (grant NNX09AJ38G).

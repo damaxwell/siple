@@ -87,7 +87,8 @@ class InvertIGN:
     The remaining arguments are passed directly from :func:`solve`, and might be used for determining the
     final stopping criterion.
 
-    Returns vectors corresponding to the initial value of *x* and the desired value of *y=F(x)*.
+    Returns vectors corresponding to the initial value of *x* and the desired value of *y=F(x)* along
+    with the desired terminal discrepancy.
     """
     raise NotImplementedError()
 
@@ -274,6 +275,42 @@ class InvertIGN:
     #   raise e
       
     return self.finalize(x, Fx)
+
+class BasicInvertIGN(InvertIGN):
+  """Inversion of a forward problem using nonlinear conjugate gradient minimization
+  and the Morozov discrepancy principle."""
+
+  def __init__(self,forward_problem,params=None):
+    InvertIGN.__init__(self,params=params)
+    self.forward_problem = forward_problem
+
+  def forwardProblem(self):
+    """
+    Returns the NonlinearForwardProblem that defines the inverse problem. 
+    """
+    return self.forward_problem
+
+  def solve(self,x0,y,targetDiscrepancy):
+    """
+    Run the iterative method starting from the initial point *x0*.
+
+    The third argument is the desired value of :math:`||y-T(x)||_Y`
+    """
+    return InvertIGN.solve(self,x0,y,targetDiscrepancy)
+
+  def initialize(self,x0,y,targetDiscrepancy):
+    """
+    This method is a hook called at the beginning of a run.  It gives an opportunity for the class to 
+    set up information needed to decide conditions for the final stopping criterion.
+
+    It may be that the initial data 'x0' expresses the the initial data for the problem T(x)=y
+    indirectly. Or it could be that x0 and y are expressed as dolfin.Function's rather than dolfind.GenericVectors.
+    So initialize returns a triple of vectors (x0,y) which are possibly modified versions of the input data.
+
+    The arguments \*args are passed directly from 'run'.
+    """
+    return (x0,y,targetDiscrepancy)
+
 
 class InvertNLCG:
   """Implements solving an ill-posed minimization problem of the form

@@ -34,7 +34,7 @@ class AbstractVector:
       self._set_from_abstract(rhs)
     else:
       self._set_from_array(rhs)
-  
+
   def _set_from_abstract(self,rhs):
     raise NotImplementedError()
 
@@ -42,8 +42,8 @@ class AbstractVector:
     """Sets the vector from anything array-like. The interpretation of this
     operation is implementation dependent."""
     raise NotImplementedError()
-    
-  
+
+
   def acc(self,rhs):
     """Adds the vector 'rhs' to the current vector (i.e. accumulates rhs)."""
     raise NotImplementedError()
