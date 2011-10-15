@@ -123,7 +123,7 @@ Example: %prog -L 10 -N 100 -n 0.1"""
     r.core()[:] -= sum(r.core())/N
 
     (ip1,ip2) = forward_problem.testTStar(d,r)
-    print 'Adjoint test:\n%f %f\nrelative error %f' % (ip1,ip1,abs(ip1-ip2)/abs(ip1))
+    print 'Adjoint test:\n%f %f\nrelative error %.2e' % (ip1,ip2,abs(ip1-ip2)/abs(ip1))
 
   else:
     p = forward_problem.p
@@ -146,5 +146,6 @@ Example: %prog -L 10 -N 100 -n 0.1"""
     pp.plot(p,y,p,yc,p,xc)
     pp.legend(('Measured function', 'Computed function', 'Computed derivative'))
     pp.draw()
+    pp.show()
 
     endpause()

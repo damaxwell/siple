@@ -10,7 +10,7 @@ from math import sqrt, exp, pi
 from matplotlib import pyplot as pp
 
 class CoeffForwardProblem(NonlinearForwardProblem):
-  """Implements the forward problem of finding a perioodic function :math:`u` 
+  """Implements the forward problem of finding a periodic function :math:`u` 
   on :math:`[0,1]` solving 
   
   .. math:: -u'' + e^{\beta} u = 1.
@@ -178,7 +178,7 @@ if __name__ == '__main__':
 
   usage =  """Usage: %prog [options]
 
-Example: %prog -L 10 -N 100 -n 0.1"""
+Example: %prog -N 100 -n 0.1"""
 
   parser = OptionParser(usage=usage)
   parser.add_option("-N","--node_count",type='int',default=40,
