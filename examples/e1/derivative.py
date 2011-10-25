@@ -147,5 +147,3 @@ Example: %prog -L 10 -N 100 -n 0.1"""
     pp.legend(('Measured function', 'Computed function', 'Computed derivative'))
     pp.draw()
     pp.show()
-    
-    endpause()
