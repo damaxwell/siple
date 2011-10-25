@@ -115,17 +115,28 @@ def debug(s,*args):
   for l in loggers:
     l(message,severity)
 
-
 def pause(message_in="Computation paused. Press any key to continue.",
           message_out='Continued'):
+  pause_callback(message_in,message_out)
+
+def set_pause_callback(callback):
+  global pause_callback
+  pause_callback = callback
+
+def std_pause(message_in=None,message_out=None):
   """
   Halt computation until a key is pressed.
   """
+  print 'std_pause'
   if not message_in is None:
     print(message_in)
   getch()
   if not message_out is None:
     print message_out
+
+pause_callback = std_pause
+
+
 
 def in_ipython():
     "Determines if the python interpreter is ipython."
@@ -170,24 +181,28 @@ class _GetchUnix:
     def __call__(self):
         import sys, termios, fcntl, os
         fd = sys.stdin.fileno()
-        oldattr = termios.tcgetattr(fd)
-        oldflags = fcntl.fcntl(fd, fcntl.F_GETFL)
-        c = 0
-        try:        
-          newattr = termios.tcgetattr(fd)
-          newattr[3] = newattr[3] & ~termios.ICANON & ~termios.ECHO
-          termios.tcsetattr(fd, termios.TCSANOW, newattr)
-          fcntl.fcntl(fd, fcntl.F_SETFL, oldflags | os.O_NONBLOCK)
+        print 'isatty', os.isatty(fd)
+        if os.isatty(fd):
+          oldattr = termios.tcgetattr(fd)
+          oldflags = fcntl.fcntl(fd, fcntl.F_GETFL)
+          c = 0
+          try:        
+            newattr = termios.tcgetattr(fd)
+            newattr[3] = newattr[3] & ~termios.ICANON & ~termios.ECHO
+            termios.tcsetattr(fd, termios.TCSANOW, newattr)
+            fcntl.fcntl(fd, fcntl.F_SETFL, oldflags | os.O_NONBLOCK)
           
-          while True:
-            try:
-              c=sys.stdin.read(1)
-              break
-            except IOError: pass
+            while True:
+              try:
+                c=sys.stdin.read(1)
+                break
+              except IOError: pass
 
-        finally:
-          termios.tcsetattr(fd, termios.TCSADRAIN, oldattr)
-          fcntl.fcntl(fd, fcntl.F_SETFL, oldflags)
+          finally:
+            termios.tcsetattr(fd, termios.TCSADRAIN, oldattr)
+            fcntl.fcntl(fd, fcntl.F_SETFL, oldflags)
+        else:
+          c = sys.stdin.read(1)
 
         return c
       
