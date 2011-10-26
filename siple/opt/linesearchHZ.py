@@ -211,7 +211,8 @@ class LinesearchHZ:
     if params.verbose: msg('midpoint with negative slope, large value. Shrinking to left.')
     (abar,bbar) = self.ushrink( a, c );
     if params.debug: self.verifyBracket(abar,bbar)
-
+    
+    return (abar,bbar)
 
   def ushrink(self,a,b):
     abar = a;
