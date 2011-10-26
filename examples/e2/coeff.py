@@ -242,7 +242,6 @@ Example: %prog -N 100 -n 0.1"""
     pp.subplot(1,2,2)
     pp.plot(x,beta.core(),x,betac.core())
     pp.legend(('True $\\beta$', 'Computed $\\beta$'))
-    pp.draw()
+    pp.ion()
     pp.show()
-    
     endpause()

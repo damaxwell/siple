@@ -127,7 +127,6 @@ def std_pause(message_in=None,message_out=None):
   """
   Halt computation until a key is pressed.
   """
-  print 'std_pause'
   if not message_in is None:
     print(message_in)
   getch()
@@ -181,28 +180,24 @@ class _GetchUnix:
     def __call__(self):
         import sys, termios, fcntl, os
         fd = sys.stdin.fileno()
-        print 'isatty', os.isatty(fd)
-        if os.isatty(fd):
-          oldattr = termios.tcgetattr(fd)
-          oldflags = fcntl.fcntl(fd, fcntl.F_GETFL)
-          c = 0
-          try:        
-            newattr = termios.tcgetattr(fd)
-            newattr[3] = newattr[3] & ~termios.ICANON & ~termios.ECHO
-            termios.tcsetattr(fd, termios.TCSANOW, newattr)
-            fcntl.fcntl(fd, fcntl.F_SETFL, oldflags | os.O_NONBLOCK)
-          
-            while True:
-              try:
-                c=sys.stdin.read(1)
-                break
-              except IOError: pass
+        oldattr = termios.tcgetattr(fd)
+        oldflags = fcntl.fcntl(fd, fcntl.F_GETFL)
+        c = 0
+        try:        
+          newattr = termios.tcgetattr(fd)
+          newattr[3] = newattr[3] & ~termios.ICANON & ~termios.ECHO
+          termios.tcsetattr(fd, termios.TCSANOW, newattr)
+          fcntl.fcntl(fd, fcntl.F_SETFL, oldflags | os.O_NONBLOCK)
+        
+          while True:
+            try:
+              c=sys.stdin.read(1)
+              break
+            except IOError: pass
 
-          finally:
-            termios.tcsetattr(fd, termios.TCSADRAIN, oldattr)
-            fcntl.fcntl(fd, fcntl.F_SETFL, oldflags)
-        else:
-          c = sys.stdin.read(1)
+        finally:
+          termios.tcsetattr(fd, termios.TCSADRAIN, oldattr)
+          fcntl.fcntl(fd, fcntl.F_SETFL, oldflags)
 
         return c
       
