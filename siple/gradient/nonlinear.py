@@ -65,12 +65,21 @@ class InvertIGN:
     self.params = self.defaultParameters()
     if not params is None: self.params.update(params)
     self.iteration_listeners = []
+    self.linear_iteration_listeners = []
 
   def addIterationListener(self,listener):
     """
     Add an object to be called after each iteration.
     """
     self.iteration_listeners.append(listener)
+
+  def addLinearIterationListener(self,listener):
+    """
+    Add an object to be called after each iteration during solution
+    of the linearized ill-posed problem.
+    """
+    self.linear_iteration_listeners.append(listener)
+
 
   ###################################################################################
   ##
@@ -125,7 +134,12 @@ class InvertIGN:
     
     forward_problem = self.forwardProblem()
     
-    (h,Th) = BasicKrylovCGNE(forward_problem, params=self.params.linearsolver).solve(x0,r,discrepancyLin)
+    linSolver = BasicKrylovCGNE(forward_problem, params=self.params.linearsolver)
+    
+    for l in self.linear_iteration_listeners:
+      linSolver.addIterationListener(l)
+    
+    (h,Th) = linSolver.solve(x0,r,discrepancyLin)
     return h
     
   def finalize(self,x,y):

@@ -33,6 +33,8 @@ class KrylovSolver:
     self.params = self.defaultParameters()
     if not params is None: self.params.update(params)
 
+    self.iteration_listeners = []
+
   def forwardProblem(self):
     """
     Returns the LinearForwardProblem that defines the inverse problem. 
@@ -45,11 +47,18 @@ class KrylovSolver:
     """  
     raise NotImplementedError()
 
-  def iterationHook(self,k,x,y,d,r,*args):
+  def addIterationListener(self,listener):
+    """
+    Add an object to be called after each iteration.
+    """
+    self.iteration_listeners.append(listener)
+
+  def iterationHook(self,count,x,y,d,r,*args):
     """
     Called during each iteration with the pertinent computations.  Handy for debugging and visualization.
     """
-    pass
+    for listener in self.iteration_listeners:
+      listener(self,count,x,y,d,r,*args)
 
   def initialize(self,x0,y,*args):
     """
@@ -120,6 +129,8 @@ class KrylovCG(KrylovSolver):
         msg('done at iteration %d', count)
         break
 
+      if self.params.verbose:
+        msg('solving linear problem')
       Td = forward_problem.T(d,out=Td)
 
       self.iterationHook( count, x, y, d, r, Td )
@@ -193,6 +204,8 @@ class KrylovCGNE(KrylovSolver):
         msg('done at iteration %d', count)
         break
 
+      if self.params.verbose:
+        msg('solving linear problem')
       Td = forward_problem.T(d,out=Td)
 
       self.iterationHook( count, x, y, d, r, Td, TStarR )
@@ -333,4 +346,8 @@ class BasicKrylovCGNE(KrylovCGNE):
     Given a current iteration number, current value of x, desired value y of F(X), and current residual, 
     returns whether the stop condition has been met.
     """
-    return sqrt(self.forward_problem.rangeIP(r,r)) <= self.params.mu*self.targetDiscrepancy
+    disc = sqrt(self.forward_problem.rangeIP(r,r))
+    target = self.params.mu*self.targetDiscrepancy
+    if self.params.verbose:
+      msg('Iteration %d: discrepancy %g target %g',iter,disc,target)
+    return disc <= target
