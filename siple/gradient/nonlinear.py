@@ -66,6 +66,7 @@ class InvertIGN:
     if not params is None: self.params.update(params)
     self.iteration_listeners = []
     self.linear_iteration_listeners = []
+    self.x_update_listeners = []
 
   def addIterationListener(self,listener):
     """
@@ -80,6 +81,8 @@ class InvertIGN:
     """
     self.linear_iteration_listeners.append(listener)
 
+  def addXUpdateListener(self,listener):
+    self.x_update_listeners.append(listener)
 
   ###################################################################################
   ##
@@ -154,6 +157,10 @@ class InvertIGN:
     """
     for listener in self.iteration_listeners:
       listener(self,count,x,Fx,y,d,r,Td)
+
+  def xUpdateHook(self,count,x,Fx,y,r):
+    for listener in self.x_update_listeners:
+      listener(self,count,x,Fx,y,r)
 
   ##
   ## End of methods to be overridden by a subclass.
@@ -255,10 +262,13 @@ class InvertIGN:
         x.axpy(t,d)
 
         Fx.set(line_search.value.data)
+
         # forward_problem.evalFandLinearize(x,out=Fx,guess=Fx)
         residual.set(y)
         residual -= Fx
         discrepancy = self.discrepancy(x,y,residual);
+
+        self.xUpdateHook(count,x,Fx,y,residual)
         
         # Check to see if we did a good job reducing the misfit (compared to the amount that we asked
         # the linearized problem to correct).
@@ -351,6 +361,10 @@ Minimization is done applying a nonlinear conjugate gradient algorithm until a s
     for listener in self.iteration_listeners:
       listener(self,count,x,Fx,y,d,r,TStarR)
 
+  def xUpdateHook(self,count,x,Fx,y,r):
+    for listener in self.x_update_listeners:
+      listener(self,count,x,Fx,y,r)
+
   def stopConditionMet(self,count,x,Fx,y,r):
     """
     Determines if minimization should be halted (based, e.g. on a Morozov discrepancy principle)
@@ -418,12 +432,19 @@ Minimization is done applying a nonlinear conjugate gradient algorithm until a s
     self.params = self.defaultParameters()
     if not params is None: self.params.update(params)
     self.iteration_listeners = []
+    self.x_update_listeners = []
 
   def addIterationListener(self,listener):
     """
     Add an object to be called after each iteration.
     """
     self.iteration_listeners.append(listener)
+
+  def addXUpdateListener(self,listener):
+    """
+    Add an object to be called after each new value of x is computed.
+    """
+    self.x_update_listeners.append(listener)
 
   def solve( self, x0, y, *args ):
     """Solve the inverse problem F(x)=y.  The initial estimate is x=x0.
@@ -508,6 +529,8 @@ Minimization is done applying a nonlinear conjugate gradient algorithm until a s
         Fx = forward_problem.evalFandLinearize(x,out=Fx,guess=Fx)
         residual.set(y)
         residual -= Fx
+
+        self.xUpdateHook(count,x,Fx,y,residual)
 
         TStarR = forward_problem.TStar(residual,out=TStarR)
 

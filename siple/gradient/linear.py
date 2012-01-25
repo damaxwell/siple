@@ -204,8 +204,6 @@ class KrylovCGNE(KrylovSolver):
         msg('done at iteration %d', count)
         break
 
-      if self.params.verbose:
-        msg('solving linear problem')
       Td = forward_problem.T(d,out=Td)
 
       self.iterationHook( count, x, y, d, r, Td, TStarR )
