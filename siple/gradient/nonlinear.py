@@ -15,7 +15,7 @@ import numpy as np
 from siple.reporting import msg
 from siple.exceptions import IterationCountFailure, NumericalFailure
 from siple import Parameters
-from siple.opt import linesearchHZ
+from siple.opt import linesearchHZ, linesearchCR
 from forward import ForwardProblemLineSearchAdaptor
 from linear import KrylovSolver, BasicKrylovCGNE
 from math import sqrt
@@ -500,12 +500,11 @@ Minimization is done applying a nonlinear conjugate gradient algorithm until a s
           raise IterationCountFailure(self.params.ITER_MAX)
         count += 1
 
+        self.iterationHook(count,x,Fx,y,d,residual,TStarR)
+
         if self.stopConditionMet(count,x,Fx,y,residual):
           msg('done at iteration %d', count)
           break
-
-
-        self.iterationHook(count,x,Fx,y,d,residual,TStarR)
 
         # Phi = lambda t: self.evalPhiAndPhiPrime(forward_problem,x,d,y,t)
         Phi = lambda t: line_searchee.eval(x,d,y,t)
